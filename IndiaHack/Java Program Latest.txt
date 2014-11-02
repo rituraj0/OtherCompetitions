@@ -1,0 +1,238 @@
+import java.math.*;
+import java.util.*;
+
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/**
+ *
+ * @author Rituraj
+ */
+public class TestClass {
+
+    /**
+     * @param args the command line arguments
+     */
+    
+  public static long mod;
+  public static long base;
+  public static long[] hash=new long[300009];
+  public static long[] expo=new long[300009];
+     
+  public static String  input,t1,t2;
+    
+  public static void init()
+  {
+	  mod=15285151248481L;
+	  base=47;	  
+	  hash[0]=0;
+
+	  for(int i=0;i<input.length();i++)
+	   {
+		   hash[i+1]=hash[i]*base + ( input.charAt(i)-'a' + 1 );
+		   hash[i+1]=hash[i+1]%mod;
+	   } 
+
+           //finding exponent of base
+	   expo[0]=1;
+	   for(int i=1;i<=input.length()+5;i++)
+	    {
+			expo[i]=( expo[i-1]*base)%mod;
+	    }	
+  }
+  
+  public static long hashValue( int a , int b )
+   {	   
+       //value of substring a & b inclusive 
+	    
+         a++; b++;
+	    
+	int len=b-a+1;
+	    
+         long ans;
+	         
+	         //Bigint version
+	  BigInteger ex=BigInteger.valueOf( expo[len] );
+	  BigInteger mul=BigInteger.valueOf( hash[a-1] );
+			    
+	  BigInteger sub=ex.multiply(mul);
+			  
+	  BigInteger  add=BigInteger .valueOf( hash[b] );
+			  
+	  add=add.subtract(sub);
+			              
+	  BigInteger   md=BigInteger.valueOf( mod);
+			   
+	  add=add.mod(md);
+			               
+	  ans=add.longValue();                   
+			       
+          return ans;
+                
+   }   
+  
+   public static void failure(String p,int f[])
+    {
+        int len=0;
+        int i;
+        f[0]=0;
+        i=1;
+        
+        int m=p.length();
+        
+        while (i<m)
+        {
+            if (p.charAt(i)==p.charAt(len))
+            {
+                len++;
+                f[i]=len;
+                i++;
+            }
+            else
+            {
+                 if(len!=0)
+                 {
+                     len=f[len-1];
+                 }
+                else
+                {
+                    f[i]=0;
+                    i++;
+                }
+             }
+        }//end while
+  }
+   
+    public static void  KMP(String t,String p,boolean ans[])
+    {
+        int n=t.length();
+        int m=p.length();
+        
+        for(int i=0;i<n;i++)
+             ans[i]=false;
+        
+        
+         System.out.println("here in KMP \n"+t+"   "+p+"\n");
+         
+        int f[]=new int[m];
+        
+        failure(p,f);
+        
+         System.out.println("Failuer function\n");
+         
+         for(int i=0;i<m;i++)
+              System.out.print(f[i]+"  ");
+        
+        
+        int i=0;
+        int j=0;
+        while (i<n)
+        {
+            if (p.charAt(j)==t.charAt(i))
+            {
+                i++;
+                j++;
+            }
+            
+            if(j==m)
+            {
+                ans[i-j]=true;
+                j=f[j-1];
+            }
+            else if(p.charAt(j)!=t.charAt(i) )
+            {
+                   if(j!=0)
+                       j=f[j-1];
+                   else
+                       i=i+1;
+            }
+        }//end while
+        
+        System.out.println("OUT of KMP");
+    }   
+  
+  public static void solve()
+  {
+       init();//hash values
+       
+       int n=input.length();
+       
+       boolean ans[]=new boolean[n];
+       
+       KMP(input,t1,ans);
+       
+       for(int i=0;i<n;i++)
+            System.out.print( ans[i] + "  ");
+       
+       String  rev=new StringBuffer(input).reverse().toString();
+       String  patt=new StringBuffer(t2).reverse().toString();
+       
+       
+       System.out.println( "\n\nAfter revrse it is "+ input+"     "+rev);
+       
+        boolean ans2[]=new boolean[n];
+         KMP(rev,patt,ans2);
+         
+         boolean ulta[]=new boolean[n];
+         
+         for(int i=0;i<n;i++)
+             ulta[i]=ans2[n-i-1];
+         
+         System.out.println( " Revrse e KMP");
+         for(int i=0;i<n;i++)
+                    System.out.print( ulta[i] + "  ");
+         
+         
+            HashSet set=new HashSet();
+            
+            int a=t1.length();
+            int b=t2.length();
+            
+            for(int i=0;i<n;i++)
+            {
+                if( ans[i]==true)
+                {
+                     for(int j=i;j<n;j++)
+                     {
+                         if( ulta[j]==true)
+                         {
+                              if(i+a-1<=j)
+                              {
+                                  if( j-b+1 >= i)
+                                  {
+                                      set.add( hashValue(i,j) );
+                                  }
+                              }
+                         }
+                     }
+                }
+            }
+            
+            System.out.println("\nFinal Anser is: "+set.size() );
+              
+
+       
+
+      
+  }
+    
+    public static void main(String[] args) throws java.lang.Exception
+    {
+           java.io.BufferedReader read = new java.io.BufferedReader (new java.io.InputStreamReader (System.in));
+           
+           while( (input=read.readLine() )!=null)
+           {
+              t1= read.readLine();
+              t2=read.readLine();
+              System.out.println(input+"  "+t1+"  "+t2);
+              
+              solve();
+                           
+           }
+           
+        
+        System.out.println("Hello");
+    }
+}

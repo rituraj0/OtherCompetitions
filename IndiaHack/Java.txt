@@ -1,0 +1,301 @@
+import java.math.*;
+import java.util.*;
+ 
+public class Main
+{
+	
+  public static long mod;
+  public static long base;
+  public static long[] hash=new long[100009];
+  public static long[] expo=new long[100009];
+ 
+  public static HashSet set=new HashSet();;
+ 
+  
+   
+  public static String input;
+  
+  public static char[] T=new char[200151];
+  public static int n;
+  
+ public static void init()
+  {
+	  mod=15285151248481L;
+	  base=47;
+	  
+	  hash[0]=0;
+	  
+	  
+	  
+	  for(int i=0;i<input.length();i++)
+	   {
+		   hash[i+1]=hash[i]*base + ( input.charAt(i)-'a' + 1 );
+		   hash[i+1]=hash[i+1]%mod;
+	   }  
+	   
+	   //finding exponent of base
+	   expo[0]=1;
+	   for(int i=1;i<=input.length()+5;i++)
+	    {
+			expo[i]=( expo[i-1]*base)%mod;
+	    }	
+	    	 
+	    
+  }	 	 
+  
+  public static long hashValue( int a , int b )
+   {
+	   
+	  
+	   
+	    //value of substring a & b inclusive 
+	    
+	    a++; b++;
+	    
+	    int len=b-a+1;
+	    
+         long ans;
+	         
+	         //Bigint version
+	          BigInteger ex=BigInteger.valueOf( expo[len] );
+			  BigInteger mul=BigInteger.valueOf( hash[a-1] );
+			    
+			  BigInteger sub=ex.multiply(mul);
+			  
+			  BigInteger  add=BigInteger .valueOf( hash[b] );
+			  
+			              add=add.subtract(sub);
+			              
+			  BigInteger   md=BigInteger.valueOf( mod);
+			   
+			               add=add.mod(md);
+			               
+			     ans=add.longValue();                   
+			       
+   
+			                 
+			  return ans;
+	    
+	                
+   }          
+	    
+	
+ public static void  preProcess() 
+ {
+  int in = input.length();
+ 
+  if (in == 0) 
+     { //T="^$";
+      T[0]='^';
+      T[1]='$';
+      n=2;
+       return;  
+      }
+ 
+ 
+   T[0]= '^';
+    n=1;
+    
+   for(int i=0;i<in;i++)
+    {
+		 T[n]='#';
+		   n++;
+		 T[n]=input.charAt(i);
+		   n++;
+    }		   
+		    
+ 
+    
+    T[n]='#';
+      n++;
+    T[n]='$';
+      n++;
+ 
+ }
+ 
+public static  void insert(int c , int len )
+{	
+	int st=(c - 1 - len)/2;
+	int ed=st+len-1;
+	
+	long val=hashValue(st,ed);	   
+	
+	set.add(val);
+}
+ 
+ 
+public static  void palindrome() 
+{
+  preProcess();  
+ 
+  
+  int[] P = new int[n];
+  
+  int C = 0, R = 0;
+  
+  for (int i = 1; i < n-1; i++) 
+   {
+    int i_mirror = 2*C-i; // equals to i' = C - (i-C)
+    
+    P[i] = (R > i) ? Math.min(R-i, P[i_mirror]) : 0;
+    
+    int last=P[i];
+    
+    	 
+    
+    // Attempt to expand palindrome centered at i
+    while (T[i + 1 + P[i] ] == T[ i - 1 - P[i] ] )
+     {
+      P[i]++;        
+     } 
+     
+      for(int k=P[i];k>=last && k>0;k-=2)
+       {
+		 insert(i , k ); 
+       }   
+ 
+     if (i + P[i] > R) 
+     {
+      C = i;
+      R = i + P[i];
+     }
+  }  
+}
+  
+ 
+  
+ 
+ 
+public static int gcd(int a,int b)
+  {  
+	     if(a==0)
+	       return b;
+	     else if(b==0)
+	       return a;
+	         
+         if(a==b)
+             return a;
+         else if(a>b)
+           return(gcd(a%b,b));
+         else
+           return(gcd(a,b%a));
+  }
+ 
+public static int euler( int n )
+{
+	 int ans=0;
+	 
+	 for(int i=1;i<=n;i++)
+	   if( gcd(i,n)==1)
+	     ans++;
+  
+	     return ans;
+}	     
+	
+public static void main (String[] args) throws java.lang.Exception
+{
+   //takin input
+      java.io.BufferedReader r = new java.io.BufferedReader (new java.io.InputStreamReader (System.in));
+ 
+         input=r.readLine();
+         
+           int N;     
+   
+            N=Integer.parseInt( r.readLine() );
+          
+           
+  // initlizing hash value and inverse Modulo functions   
+  
+         init();      
+         
+         //preProcess() ;
+        //calling palindrome
+         palindrome();
+         
+         //
+         long K=set.size();
+         
+         
+          
+          
+            //System.out.println("String lenght is "+ input.length() );
+        // System.out.println("All distinct palindrome K is  "+K+"\n\n"); 
+ 
+  
+         // System.out.println("String lenght is "+ input.length() );
+         //System.out.println("All distinct palindrome K is  "+K+"\n\n");
+         
+     ///Now final calculation stsrts  
+     
+       BigInteger  neck=BigInteger.valueOf(0);
+       BigInteger  kb  =BigInteger.valueOf(K);
+       
+      // System.out.println("Now Neck calculation");
+       
+       for(int d=1;d<=N;d++)
+         if( N%d==0)
+          {
+			  
+			  BigInteger temp=BigInteger.valueOf( euler(d) );
+			  
+			  int ex=N/d;
+			  
+			  BigInteger mult=kb.pow(ex);
+			  
+			  temp=temp.multiply(mult);
+			  
+			  
+			 // System.out.println(temp);
+			  
+			  neck=neck.add(temp);
+	       }		  
+        
+        
+        neck=neck.divide( BigInteger.valueOf(N) );
+        
+    //System.out.println(" Neck is " + neck);
+        
+        
+        //now finding number of braclets
+        
+        if( N%2==0)
+         {
+			 
+			  BigInteger add1=neck.multiply( BigInteger.valueOf(2) );
+			  
+			  
+			  BigInteger temp=BigInteger.valueOf( K+1 );
+			  BigInteger temp2=BigInteger.valueOf(K);
+			              temp2=temp2.pow(N/2);
+			              
+			  BigInteger   add2=temp.multiply(temp2);
+			                add2=add2.divide(   BigInteger.valueOf(1)  );
+			                
+			  BigInteger ans=add1.add(add2);
+			  
+			   ans=ans.divide( BigInteger.valueOf(4)  );
+			  
+			  System.out.println(ans);
+	     }	
+	    else
+	     {
+			  BigInteger add1=neck.divide( BigInteger.valueOf(1) );
+			  
+			  BigInteger temp=BigInteger.valueOf(K);
+			             temp=temp.pow( (N+1)/2);
+			             
+			 BigInteger   add2=temp.divide(   BigInteger.valueOf(1)  ); 
+			 
+			 BigInteger ans=add1.add(add2);
+			 
+			             ans=ans.divide( BigInteger.valueOf(2)  );
+                           
+			  
+			 System.out.println(ans);          
+	     }		 
+			 
+ 
+  
+}
+ 
+}

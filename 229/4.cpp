@@ -1,0 +1,109 @@
+#include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <cstring>
+#include <cstdlib>
+#include <climits>
+#include <fstream>
+#include <cctype>
+#include <cstdio>
+#include <string>
+#include <vector>
+#include <queue>
+#include <stack>
+#include <cmath>
+#include <ctime>
+#include <map>
+#include <set>
+using namespace std;
+
+#define pb push_back
+#define mp make_pair
+#define sz size()
+#define bg begin()
+#define en end()
+#define Y second
+#define X first
+typedef long long ll;
+
+#define fi freopen("input.txt","r",stdin)
+#define fo freopen("output.txt","w",stdout)
+
+const double pi     =   acos(-1.0);
+const double eps    =   1e-8;
+
+#define print(a) cout<<(#a)<<" = "<<a<<"  ";
+#define println(a) cout<<(#a)<<" = "<<a<<"\n";
+#define fill(a,val) memset(a ,val, sizeof(a) );
+
+vector <string> parse(string s, string c)
+{
+  int len = c.length(), p = -len, np;
+  vector <string> ans;
+
+  do
+    {
+      np = s.find(c, p+len);
+      ans.push_back(s.substr(p+len, np - p - len));
+      p = np;
+    }
+  while (p != string::npos);
+
+  return ans;
+}
+
+
+/*Solution code starts here */
+
+
+int main()
+{
+ ios_base::sync_with_stdio(0);
+
+ int ans[2600][2];
+
+ int n,m,k;
+
+ cin>>n>>m>>k;
+
+
+ int x=1,y=1,sm=1;
+
+ int cost=0;
+
+ for(int i=1;i<=k;i++)
+ {
+      ans[i][0]=x;
+      ans[i][1]=y;
+      x--;
+      y++;
+      cost+=sm;
+
+      if( (x < 1) || (y > n) )
+      {
+          sm++;
+          x=min(sm,m);
+          y=sm+1-x;
+      }
+ }
+
+ cout<<cost<<endl;
+
+ for(int i=k;i>0;i--)
+ {
+        for(int x=1;x<=ans[i][0];x++)
+             cout<<"("<<x<<",1) ";
+
+        for(int y=2;y<=ans[i][1];y++)
+              cout<<"("<<ans[i][0]<<","<<y<<") ";
+
+        cout<<endl;
+ }
+
+
+ //##
+
+ return 0;
+
+}
