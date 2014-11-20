@@ -43,9 +43,6 @@ int solve( int lo ,int hi ,int val)//val se  maxi of all bada
     return ans;
 }
 
-bool aval[1<<21];
-int prev[1<<21];
-
 int main()
 {
  ios_base::sync_with_stdio(0);
@@ -62,15 +59,11 @@ int main()
      st.insert(x);
  }
 
- fill(aval,0);
- fill(prev,0);
 
 
-
- //all.pb(0);
+ all.pb(0);
 
  int mx=0;
-
 
  for( set<int>::iterator it=st.begin() ; it !=st.end() ; it++)
  {
@@ -78,42 +71,29 @@ int main()
      mx=max(mx,*it);
  }
 
- for(int i=0;i<sz(all);i++)
- {
-     aval[ all[i] ]=true;
- }
-
- int mila=0;
-
- for(int i=1;i<=2*mx;i++)
- {
-     prev[i]=mila;
-
-     if( aval[i] )
-        mila=i;
- }
-
-
  int ans=0;
 
- for(int i=0;i<sz(all);i++)// )(n)
+// print(mx);
+
+ for(int i=1;i<sz(all);i++)// )(n)
  {
      int tp=all[i];
 
-     //cout<<tp<<"   " ;
+    // cout<<tp<<"   " ;
 
      for(int j=tp;j<=2*mx;j+=tp)//O( lg (n) ) , amortized cost
      {
+         //find lower at j
+         int x= solve(i+1,n , j); // O(lg(n))
+         // tp se bada and j se chhota
+         //what if j-1 & j both , search for exavly smaaller
 
-         int x = prev[j];
+         ans=max( ans , x%tp);
 
-         if( x > tp )
-         ans=max( ans , x%tp );
-
-        // cout<<j<<"-"<<x<<"   ";
+         //cout<<j<<"-"<<x<<"   ";
      }
 
-     //<<endl;
+    // cout<<endl;
  }
 
  cout<<ans<<endl;
