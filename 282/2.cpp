@@ -17,16 +17,19 @@ const double eps    =   1e-8;
 /*Solution code starts here */
 
 
+#define maxn 100009
+
 string text ,pat;
+int n,m;
 
-bool endhere[100009];
+bool endhere[maxn];
 
-bool lcp[100009];
+int lcp[maxn];
 
 void init()
 {
-    int n=text.size();
-    int m=pat.size();
+     n=text.size();
+     m=pat.size();
 
      //compute lcp
     lcp[0]=0;
@@ -73,32 +76,91 @@ void init()
          else if( (i<n) && (text[i]!=pat[len]) )
          {
             if( len > 0)
-            len = lcp[len-1];
+             len = lcp[len-1];
             else
              i++;
          }
+    }//end match for
 
-    }
 }
 
+int last[maxn];
+
+ll dp[maxn];
+ll sum[maxn];
+
+const ll mod= 1000000007LL;
+            //1000000007
 int main()
 {
  ios_base::sync_with_stdio(0);
 
- while(1)
- {
      cin>>text>>pat;
 
      fill(endhere,0);
 
       init();
 
-      for(int i=0;i<n;i++)
-         if( endhere[i])
-          cout<<i<<" - ";
- }
+//     int fs=-1;
+//
+//     for(int i=0;i<n;i++)
+//         if( endhere[i])
+//         {
+//           fs=i+1;
+//           break;
+//         }
+//
+//       if( fs==-1)
+//       {
+//           cout<<"0"<<endl;
+//           continue;
+//       }
+//
+//      for(int i=0;i<n;i++)
+//         if( endhere[i])
+//             cout<<i<<" - ";
+//
+//          cout<<endl;
 
+      int seen = -1;
+
+      for(int i=1;i<=n;i++)
+      {
+          if( i >= m)
+             {
+                if( endhere[i-1])
+                {
+                    seen=i-m;
+                   // cout<<i<<"  "<<seen<<endl;
+                }
+             }
+
+           last[i]=seen;
+      }
+
+//      for(int i=1;i<=n;i++)
+//        cout<<last[i]<<" - ";
+//
+//      cout<<"\n\n";
+
+      dp[0]=1;
+      sum[0]=1;
+
+      for(int i=1;i<=n;i++)
+      {
+          dp[i]=dp[i-1];
+
+          if( last[i]!=-1)
+             dp[i]= (dp[i] + sum[ last[i] ] )%mod;
+
+           sum[i]= (sum[i-1] + dp[i])%mod;
+      }
+
+      cout<<(mod+dp[n]-1)%mod<<endl;
 
  return 0;
 
 }
+
+
+//9125835
