@@ -43,7 +43,13 @@ int main()
      if( mapa[ in[i]-x ]==true)
         x_mila=true;
 
+     if( mapa[ in[i]+x ]==true)
+        x_mila=true;
+
      if( mapa[ in[i]-y ]==true)
+        y_mila=true;
+
+     if( mapa[ in[i]+y ]==true)
         y_mila=true;
  }
 
@@ -53,32 +59,46 @@ int main()
      return 0;
  }
 
- if( x_mila || y_mila )
+ vector<int> opt;
+
+ for(int i=0;i<n;i++)
  {
-    cout<<"1"<<endl;
+     if( in[i]-x >=0)
+         opt.pb( in[i]-x );
 
-    if(!x_mila)
-        cout<<x<<endl;
-    else
-        cout<<y<<endl;
+     if( in[i]+x <=len)
+         opt.pb( in[i] + x);
 
-        return 0;
+     if( in[i]-y >=0 )
+         opt.pb( in[i]-y );
+
+     if( in[i]+y <=len )
+         opt.pb( in[i]+y ) ;
  }
 
-      for(int i=0;i<n;i++)
-         if( mapa[ in[i]-x-y]==true)
-            {
-                cout<<"1"<<endl;
 
-                cout<<in[i]-x<<endl;
+ for(int  i=0;i<sz(opt);i++)
+ {
+      bool xm=false,ym=false;
+      int curr=opt[i];
 
-                return 0;
-            }
+      if( mapa[ curr -x ] || mapa[ curr+x])
+       xm=true;
+
+      if( mapa[ curr -y] || mapa[ curr + y])
+        ym=true;
+
+      if( ( xm && ym ) || ( x_mila && ym) || ( xm && y_mila) )
+      {
+          cout<<"1"<<endl;
+          cout<<curr<<endl;
+          return 0;
+      }
+ }
 
  cout<<"2"<<endl;
 
  cout<<x<<" "<<y<<endl;
-
 
 
 
