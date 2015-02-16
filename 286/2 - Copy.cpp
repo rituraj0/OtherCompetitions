@@ -57,6 +57,11 @@ void  build_undirec()
       cc++;
     }
 
+    print(cc);
+
+    for(int i=0;i<cc;i++,cout<<endl)
+         for(int j=0;j<sz( ccmem[i] );j++)
+             cout<<ccmem[i][j]<<" . ";
 }
 
 //now scc section
@@ -101,7 +106,7 @@ void targen( int v)
          }
      }
 
-    // cout<<v<<"  "<<low[v]<<"  "<<index[v]<<endl;
+     cout<<v<<"  "<<low[v]<<"  "<<index[v]<<endl;
 
      if( low[v] == index[v])
      {
@@ -114,12 +119,13 @@ void targen( int v)
              countmem[sccid]++;
              inscc[curr]=sccid;
 
-            // cout<<curr<<"  sid: "<<sccid<<" "<<countmem[sccid]<<endl;
+             cout<<curr<<"  sid: "<<sccid<<" "<<countmem[sccid]<<endl;
 
              if( curr == v)
                 break;
          }
 
+         //cout<<" count in   "<<sccid<<"  "<,
 
          sccid++;
      }
@@ -189,6 +195,7 @@ int main()
 
      int add = sz( ccmem[cp] );
 
+     print(add);
 
      if(!cycle)
         add--;
@@ -196,7 +203,7 @@ int main()
      ans+=add;
  }
 
- cout<<ans<<endl;
+ print(ans);
 
  return 0;
 
