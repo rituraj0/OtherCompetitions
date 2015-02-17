@@ -16,143 +16,186 @@ const double eps    =   1e-8;
 #define fill(a,val) memset(a ,val, sizeof(a) );
 /*Solution code starts here */
 
-#define maxn 300009
+#define maxn 100009
 
-int val[maxn],N;
+pair<int,int> nodes[maxn];
+ll sum[maxn];
+int baap[maxn];
 
-/* count number of  bit diff */
-//fromhttps://sites.google.com/site/indy256/algo/sparse_table_rmq
-int logtable[maxn];
 
-void  populate_log()
+int n,ed,road, reg;
+
+
+set< pair<ll,int> > st;// (sm , node )
+
+
+void update( int a, int b)//delete a from se, and insert curr[sum] from b
 {
-    fill( logtable,0);
+    st.erase( mp(sum[a],a ) );
 
-    for(int i=2;i<=N;i++)
-        logtable[i]=logtable[i>>1]+1;
+    if(a!=b)// can be the case when we join nodes in same components
+    st.erase( mp(sum[b],b ) );
+
+    st.insert( mp(sum[b],b ) );
+
+    if(a!=b)
+        nodes[a]=mp(a,b);
 }
-/* RMQ using sparse table */
-int mini[maxn][20];
 
-void mini_process()
+int root( int u)
 {
-    for(int i=0;i<N;i++)
-        mini[i][0]=i;
+    if( baap[u]==u)
+         return u;
 
-    for(int len=1 ; (1<<len)<=N; len++)
-      for(int i=0;i+(1<<len)-1 < N ;i++)
-      {
-         int  mid = i+ (1<<(len-1) );
+    return baap[u]= root( baap[u] );
 
-         if( val[ mini[i][len-1] ] < val[ mini[mid][len-1] ])
-         {
-             mini[i][len]=mini[i][len-1];
-         }
+}
+
+void join( int x, int y)
+{
+    int xp = root(x) , yp=root(y);
+
+    if( xp == yp )
+    {
+        sum[xp]+=1000;//if in same comp , add 1000
+        update(xp,xp);
+    }
+    else
+    {
+        ll a = sum[xp];
+        ll b = sum[yp];
+        ll c = min( (ll)(1e9) , a+b+1  );
+
+        if( rand()&1)
+        {
+            baap[xp]=yp;
+            sum[yp]+=sum[xp]+c;
+            update(xp,yp);//delete xp from set ,
+        }
         else
         {
-            mini[i][len] = mini[mid][len-1];
+            baap[yp]=xp;
+            sum[xp]+=sum[yp]+c;
+            update(yp,xp);//delete yp from set
+
         }
     }
 }
 
-int mini_query ( int st, int ed)
+void pre_join( int x, int y , ll len)
 {
-     int diff= logtable[ ed-st ];
-     int lf = val[ mini[st][diff] ];
-     int rt = val [ mini[ed-(1<<diff)+1][diff] ];
-     return min(lf,rt);
-    // bit =
+    int xp = root(x) , yp=root(y);
+
+    if( xp == yp )
+    {
+        sum[xp]+=len;
+        update(xp,xp);
+    }
+    else
+    {
+        if( rand()&1)
+        {
+            baap[xp]=yp;
+            sum[yp]+=len;
+            update(xp,yp);
+        }
+        else
+        {
+            baap[yp]=xp;
+            sum[xp]+=len;
+            update(yp,xp);
+        }
+    }
 }
 
-/* RMQ using sparse table */
-int gcd[maxn][20];
-
-void gcd_process()
-{
-    for(int i=0;i<N;i++)
-        gcd[i][0]=val[i];
-
-    for(int len=1 ; (1<<len)<=N; len++)
-      for(int i=0;i+(1<<len)-1 < N ;i++)
-      {
-         int  mid = i+ (1<<(len-1) );
-
-         gcd[i][len]= __gcd( gcd[i][len-1] , gcd[mid][len-1] );
-      }
-}
-
-
-int gcd_query ( int st, int ed)
-{
-     int diff= logtable[ ed-st ];
-     int lf = gcd[st][diff] ;
-     int rt = gcd[ed-(1<<diff)+1][diff] ;
-     return __gcd(lf,rt);
-    // gcd compexity is number og digit ( in base 10 ) , of minimum number , from wiwkiperdia
-}
-
-vector<int>  solve( int len)
-{
-   vector<int> ans;
-
-   for(int i=0;i+len-1<N;i++)
-     if( gcd_query(i,i+len-1)==mini_query(i,i+len-1))
-       ans.pb(i+1);
-
-   return ans;
-}
+vector< pair<int,int> > ans;
 
 int main()
 {
  ios_base::sync_with_stdio(0);
 
- cin>>N;
+ fill( sum , 0);
 
- for(int i=0;i<N;i++)
-    cin>>val[i];
+ cin>>n>>ed>>road>>reg;
 
- //poppilte log table
-  populate_log();
+ for(int i=1;i<=n;i++)
+ {
+     baap[i]=i;
+     nodes[i]=mp(i,-1);
+     st.insert( mp(0LL,i) );
+ }
 
-  //build mini tree
-  mini_process();
+ int a,b;
+ ll len;
 
-  //build gcd tree
-  gcd_process();
+ for(int i = 1; i<=ed; i++)
+ {
+     cin>>a>>b>>len;
 
-  //now start query
+     pre_join(a,b,len);
+ }
 
-   int a, b;
+ int comp =0;
 
- // cout<<mini_query(1,4)<<"  "<<gcd_query(1,4)<<endl;
+ for(int i=1;i<=n;i++)
+     if( root(i)==i)
+      comp++;
 
-   vector<int> ans=solve(1);
-   int len =1;
+ if( comp < reg)//can not form reg regions
+ {
+     cout<<"NO\n";
+     return 0;
+ }
 
-  int lo = 1 ,hi = N;//lo always true
+ int ex =  comp - reg;
 
-  while( lo < hi)
-  {
-      int mid = (lo+hi+1)/2;
+ int done = 0;
 
-       vector<int> tp = solve(mid);
+ for(int i=0;i<ex;i++)//join this time
+ {
+    if( sz(st) < 2 )
+        break; //can take two differnt array
+    int a =  (*st.begin()).Y;//get node from 2 compnents
+               st.erase( st.begin() );
 
-       if( sz(tp)>0)
-       {
-           len = mid;
-           ans = tp;
-           lo=mid;
-       }
-       else
-       {
-          hi=mid-1;
-       }
-  }
+    int b =  (*st.begin()).Y;//get node from
+               st.erase( st.begin() );
 
-  cout<<sz(ans)<<" "<<len-1<<endl;
+      ans.pb( mp(a,b));
 
-  for(int i=0;i<sz(ans);i++)
-    cout<<ans[i]<<" ";
+      done++;
+ }
+
+ //find any comp where number of nodes is  grater than or equal to 2
+ int id = -1;
+
+ for(int i=1;i<=n;i++)
+     if( root(i) == i)
+    {
+        if( nodes[i].Y!=-1)
+             id=i;
+    }
+
+ if( id !=-1 )
+ {
+
+   while( done < road)
+   {
+       ans.pb( nodes[id] );
+   }
+ }
+
+if( sz(ans)!=road )
+{
+    cout<<"NO\n";
+    return 0;
+}
+
+cout<<"YES\n";
+
+for(int i=0;i<road;i++)
+    cout<<ans[i].X<<" "<<ans[i].Y<<endl;
+
 
  return 0;
 
